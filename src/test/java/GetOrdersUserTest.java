@@ -1,4 +1,6 @@
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +20,7 @@ public class GetOrdersUserTest {
     private static User user;
     // Получение заказов авторизованного пользователя
     @Test
+    @DisplayName("Receiving orders from an authorized user")
     public void getOrdersAuthUserTest() {
         // создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -35,9 +38,12 @@ public class GetOrdersUserTest {
 
     // Получение заказов неавторизованного пользователя
     @Test
+    @DisplayName("Receiving orders without authorization")
     public void getOrdersNotAuthUserTest() {
         // получение заказов
-        Utils.doGet(Constants.GET_ORDERS)
+        Response response = Utils.doGetResp(Constants.GET_ORDERS);
+        response
+                .then()
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
                 .body(equalTo("{\"success\":false,\"message\":\"You should be authorised\"}"));

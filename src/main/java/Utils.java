@@ -18,7 +18,7 @@ public class Utils {
         throw new IllegalAccessError("Utility class");
     }
 
-    // GET без токена (Response)
+    // GET без токена (Response) (3)
     public static Response doGetResp(String endpoint) {
         return given()
                 .log().all()
@@ -26,17 +26,7 @@ public class Utils {
                 .get(endpoint);
     }
 
-    // GET без токена
-    public static ValidatableResponse doGet(String endpoint) {
-        return given()
-                .log().all()
-                .header("Content-type", "application/json")
-                .get(endpoint)
-                .then()
-                .log().all();
-    }
-
-    // GET c токеном
+    // GET c токеном (1)
     public static ValidatableResponse doGet(String endpoint, String token) {
         return given()
                 .log().all()
@@ -47,8 +37,8 @@ public class Utils {
                 .log().all();
     }
 
-    // POST тело - объект, с токеном
-    public static ValidatableResponse doPost(String endpoint, Object body, String token) {
+    // POST тело - строка, с токеном (2)
+    public static ValidatableResponse doPost(String endpoint, String body, String token) {
         return given()
                 .log().all()
                 .auth().oauth2(token)
@@ -60,19 +50,7 @@ public class Utils {
                 .log().all();
     }
 
-    // POST без тела запроса, с токеном
-    public static ValidatableResponse doPostWithoutBody(String endpoint, String token) {
-        return given()
-                .log().all()
-                .auth().oauth2(token)
-                .header("Content-type", "application/json")
-                .when()
-                .post(endpoint)
-                .then()
-                .log().all();
-    }
-
-    // POST тело - объект, без токена
+    // POST тело - объект, без токена (18)
     public static ValidatableResponse doPost(String endpoint, Object body) {
         return given()
                 .log().all()
@@ -84,7 +62,7 @@ public class Utils {
                 .log().all();
     }
 
-    // POST тело - строка, без токена
+    // POST тело - строка, без токена (2)
     public static ValidatableResponse doPost(String endpoint, String body) {
         return given()
                 .log().all()
@@ -96,19 +74,7 @@ public class Utils {
                 .log().all();
     }
 
-    // PATCH тело - строка, с токеном
-    public static ValidatableResponse doPatch(String endpoint, String body, String token) {
-        return given()
-                .log().all()
-                .auth().oauth2(token)
-                .header("Content-type", "application/json")
-                .body(body)
-                .when()
-                .patch(endpoint)
-                .then()
-                .log().all();
-    }
-    // PATCH с токеном (Response)
+    // PATCH с токеном (Response) (4)
     public static Response doPatchResp (String endpoint, String body, String token) {
         return given()
                 .log().all()
@@ -119,7 +85,7 @@ public class Utils {
                 .patch(endpoint);
     }
 
-    // PATCH без токена
+    // PATCH без токена (3)
     public static ValidatableResponse doPatch(String endpoint, String body) {
         return given()
                 .log().all()
@@ -131,8 +97,6 @@ public class Utils {
                 .log().all();
     }
 
-
-
     @Step("Создаем пользователя")
     public static void createUser(User user) {
         //отправляем запрос на создание пользователя
@@ -142,6 +106,7 @@ public class Utils {
                 .body("success", equalTo(true), "user", notNullValue(), "accessToken", notNullValue(), "refreshToken", notNullValue());
     }
 
+    @Step("Удаляем пользователя")
     public static void deleteUser(User user) {
         if (user != null) {
             AuthUser authUser = new AuthUser(user.getEmail(), user.getPassword());

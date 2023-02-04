@@ -1,3 +1,4 @@
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import org.junit.*;
 import pojo.User;
@@ -15,7 +16,8 @@ public class UserTest {
     private  static User user;
 
     @Test
-    public void creatingUserTest() {
+    @DisplayName("Create a unique user") // имя теста
+    public void createUserTest() {
         //создаем нового пользователя
         String randomString = Utils.getRandomString(8);
         String randomEmail = Utils.getRandomString(8) + "@" + Utils.getRandomString(6) + "." + Utils.getRandomString(3);
@@ -26,7 +28,8 @@ public class UserTest {
     }
 
     @Test
-    public void creatingIdenticalUserTest() {
+    @DisplayName("Create a user who is already registered") // имя теста
+    public void createIdenticalUserTest() {
         //создаем нового пользователя
         String randomString = Utils.getRandomString(8);
         String randomEmail = Utils.getRandomString(8) + "@" + Utils.getRandomString(6) + "." + Utils.getRandomString(3);
@@ -43,7 +46,8 @@ public class UserTest {
     }
 
     @Test
-    public void creatingUserWithEmptyEmailTest() {
+    @DisplayName("Create a user with an empty field email") // имя теста
+    public void createUserWithEmptyEmailTest() {
         //создаем нового пользователя
         String randomString = Utils.getRandomString(8);
         user = new User("", randomString, randomString);
@@ -56,7 +60,8 @@ public class UserTest {
     }
 
     @Test
-    public void creatingUserWithEmptyPasswordTest() {
+    @DisplayName("Create a user with an empty field password") // имя теста
+    public void createUserWithEmptyPasswordTest() {
         //создаем нового пользователя
         String randomString = Utils.getRandomString(8);
         user = new User(randomString, "", randomString);
@@ -69,7 +74,8 @@ public class UserTest {
     }
 
     @Test
-    public void creatingUserWithEmptyNameTest() {
+    @DisplayName("Create a user with an empty field name") // имя теста
+    public void createUserWithEmptyNameTest() {
         //создаем нового пользователя
         String randomString = Utils.getRandomString(8);
         user = new User(randomString, randomString, "");

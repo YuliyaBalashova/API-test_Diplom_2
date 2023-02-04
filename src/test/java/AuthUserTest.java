@@ -1,3 +1,4 @@
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import org.junit.*;
 import pojo.AuthUser;
@@ -17,6 +18,7 @@ public class AuthUserTest {
 
     //авторизация под существующим пользователем
     @Test
+    @DisplayName("Authorization of an existing user") // имя теста
     public void authUserTest() {
         //создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -35,6 +37,7 @@ public class AuthUserTest {
 
     //авторизация пользователя c неверным email
     @Test
+    @DisplayName("authorization of a user with an invalid email") // имя теста
     public void authUserWithWrongEmailTest() {
         //создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -53,6 +56,7 @@ public class AuthUserTest {
 
     //авторизация пользователя c неверным password
     @Test
+    @DisplayName("authorization of a user with an invalid password") // имя теста
     public void authUserWithWrongPasswordTest() {
         //создание нового пользователя
         String randomString = Utils.getRandomString(8);

@@ -1,3 +1,4 @@
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.After;
@@ -20,6 +21,7 @@ public class ChangeUserTest {
 
     // Изменение email пользователя с авторизацией
     @Test
+    @DisplayName("Changing the user's email with authorization") // имя теста
     public void changeUserEmailTest() {
         // создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -46,6 +48,7 @@ public class ChangeUserTest {
 
     // Изменение password пользователя с авторизацией
     @Test
+    @DisplayName("Changing the user's password with authorization") // имя теста
     public void changeUserPasswordTest() {
         //создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -72,6 +75,7 @@ public class ChangeUserTest {
 
     // Изменение name пользователя с авторизацией
     @Test
+    @DisplayName("Changing the user's name with authorization") // имя теста
     public void changeUserNameTest() {
         // создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -98,6 +102,7 @@ public class ChangeUserTest {
 
     //Изменение email на уже использующийся с авторизацией
     @Test
+    @DisplayName("Changing the user's email to an existing email with authorization") // имя теста
     public void changeUserEmailUsingTest() {
         //создание нового пользователя1
         String randomString = Utils.getRandomString(8);
@@ -112,7 +117,9 @@ public class ChangeUserTest {
                 .extract().body().jsonPath().get("accessToken");
 
         //изменение email пользователя2 на email пользователя1
-        Utils.doPatch(Constants.USER_CHANGE, "{\"email\":\"" + randomEmail + "\"}", token.substring(7))
+        Response response = Utils.doPatchResp(Constants.USER_CHANGE, "{\"email\":\"" + randomEmail + "\"}", token.substring(7));
+        response
+                .then()
                 .statusCode(SC_FORBIDDEN)
                 .and()
                 .body(equalTo("{\"success\":false,\"message\":\"User with such email already exists\"}"));
@@ -120,6 +127,7 @@ public class ChangeUserTest {
 
     //Изменение email пользователя без авторизации
     @Test
+    @DisplayName("Changing the user's email without authorization") // имя теста
     public void changeUserEmailDefaultTest() {
         //создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -138,6 +146,7 @@ public class ChangeUserTest {
 
     //Изменение password пользователя без авторизации
     @Test
+    @DisplayName("Changing the user's password without authorization") // имя теста
     public void changeUserPasswordDefaultTest() {
         //создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -156,6 +165,7 @@ public class ChangeUserTest {
 
     //Изменение name пользователя без авторизации
     @Test
+    @DisplayName("Changing the user's name without authorization") // имя теста
     public void changeUserNameDefaultTest() {
         //создание нового пользователя
         String randomString = Utils.getRandomString(8);

@@ -1,3 +1,4 @@
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.After;
@@ -21,6 +22,7 @@ public class CreateOrderTest {
 
     // Создание заказа с ингредиантами авторизованным пользователем
     @Test
+    @DisplayName("Creating an order with ingredients by a user with authorization") // имя теста
     public void createOrderWithIngredientAuthUserTest() {
         // создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -42,6 +44,7 @@ public class CreateOrderTest {
 
     // Создание заказа без ингредиантов авторизованным пользователем
     @Test
+    @DisplayName("Creating an order without ingredients by a user with authorization") // имя теста
     public void createOrderWithoutIngredientAuthUserTest() {
         // создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -50,8 +53,15 @@ public class CreateOrderTest {
         // получение token
         String token = Utils.doPost(Constants.CREATE_USER, user)
                 .extract().body().jsonPath().get("accessToken");
-        //создание заказа
-        Utils.doPostWithoutBody(Constants.CREATE_ORDER, token.substring(7))
+        //создание заказа без ингредиентов
+        given()
+                .log().all()
+                .auth().oauth2(token.substring(7))
+                .header("Content-type", "application/json")
+                .when()
+                .post(Constants.CREATE_ORDER)
+                .then()
+                .log().all()
                 .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body(equalTo("{\"success\":false,\"message\":\"Ingredient ids must be provided\"}"));
@@ -59,6 +69,7 @@ public class CreateOrderTest {
 
     // Создание заказа с несуществующими ингредиантами авторизованным пользователем
     @Test
+    @DisplayName("Creating an order with non-existent ingredients by a user with authorization") // имя теста
     public void createOrderWithNotIsIngredientAuthUserTest() {
         // создание нового пользователя
         String randomString = Utils.getRandomString(8);
@@ -74,6 +85,7 @@ public class CreateOrderTest {
 
     // Создание заказа с ингредиантами неавторизованным пользователем
     @Test
+    @DisplayName("Creating an order with ingredients by a user without authorization") // имя теста
     public void createOrderWithIngredientNotAuthUserTest() {
         // получение хэша ингредиентов
         Response response = Utils.doGetResp(Constants.GET_INGREDIENT);
@@ -89,6 +101,7 @@ public class CreateOrderTest {
 
     // Создание заказа без ингредиантов неавторизованным пользователем
     @Test
+    @DisplayName("Creating an order without ingredients by a user without authorization") // имя теста
     public void createOrderWithoutIngredientNotAuthUserTest() {
         //создание заказа
         given()
@@ -106,6 +119,7 @@ public class CreateOrderTest {
 
     // Создание заказа с несуществующими ингредиантами неавторизованным пользователем
     @Test
+    @DisplayName("Creating an order with non-existent ingredients by a user without authorization") // имя теста
     public void createOrderWithNotIsIngredientNotAuthUserTest() {
         String randomString = Utils.getRandomString(8);
         //создание заказа
