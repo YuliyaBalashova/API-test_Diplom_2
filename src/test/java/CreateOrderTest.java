@@ -1,0 +1,121 @@
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import pojo.Ingredient;
+import pojo.User;
+
+import static io.restassured.RestAssured.given;
+import static org.apache.http.HttpStatus.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+
+public class CreateOrderTest {
+    @Before
+    public void setUp() {
+        RestAssured.baseURI = Constants.BASE_URL;
+    }
+
+    private static User user;
+
+    // Создание заказа с ингредиантами авторизованным пользователем
+    @Test
+    public void createOrderWithIngredientAuthUserTest() {
+        // создание нового пользователя
+        String randomString = Utils.getRandomString(8);
+        String randomEmail = Utils.getRandomString(8) + "@" + Utils.getRandomString(6) + "." + Utils.getRandomString(3);
+        user = new User(randomEmail, randomString, randomString);
+        // получение token
+        String token = Utils.doPost(Constants.CREATE_USER, user)
+                .extract().body().jsonPath().get("accessToken");
+        // получение хэша ингредиентов
+        Response response = Utils.doGetResp(Constants.GET_INGREDIENT);
+        // десериализация тела ответа в класс ChangeUser
+        Ingredient ingredient = response.body().as(Ingredient.class);
+        //создание заказа
+        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + ingredient.getData().get(1).get_id() + "\",\"" + ingredient.getData().get(2).get_id() + "\"]}", token.substring(7))
+                .statusCode(SC_OK)
+                .and()
+                .body("success", equalTo(true), "name", notNullValue(), "order", notNullValue());
+    }
+
+    // Создание заказа без ингредиантов авторизованным пользователем
+    @Test
+    public void createOrderWithoutIngredientAuthUserTest() {
+        // создание нового пользователя
+        String randomString = Utils.getRandomString(8);
+        String randomEmail = Utils.getRandomString(8) + "@" + Utils.getRandomString(6) + "." + Utils.getRandomString(3);
+        user = new User(randomEmail, randomString, randomString);
+        // получение token
+        String token = Utils.doPost(Constants.CREATE_USER, user)
+                .extract().body().jsonPath().get("accessToken");
+        //создание заказа
+        Utils.doPostWithoutBody(Constants.CREATE_ORDER, token.substring(7))
+                .statusCode(SC_BAD_REQUEST)
+                .and()
+                .body(equalTo("{\"success\":false,\"message\":\"Ingredient ids must be provided\"}"));
+    }
+
+    // Создание заказа с несуществующими ингредиантами авторизованным пользователем
+    @Test
+    public void createOrderWithNotIsIngredientAuthUserTest() {
+        // создание нового пользователя
+        String randomString = Utils.getRandomString(8);
+        String randomEmail = Utils.getRandomString(8) + "@" + Utils.getRandomString(6) + "." + Utils.getRandomString(3);
+        user = new User(randomEmail, randomString, randomString);
+        // получение token
+        String token = Utils.doPost(Constants.CREATE_USER, user)
+                .extract().body().jsonPath().get("accessToken");
+        //создание заказа
+        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + randomString + "\",\"" + randomString + "\"]}", token.substring(7))
+                .statusCode(SC_INTERNAL_SERVER_ERROR);
+    }
+
+    // Создание заказа с ингредиантами неавторизованным пользователем
+    @Test
+    public void createOrderWithIngredientNotAuthUserTest() {
+        // получение хэша ингредиентов
+        Response response = Utils.doGetResp(Constants.GET_INGREDIENT);
+        // десериализация тела ответа в класс ChangeUser
+        Ingredient ingredient = response.body().as(Ingredient.class);
+        //создание заказа
+        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + ingredient.getData().get(1).get_id() + "\",\"" + ingredient.getData().get(5).get_id() + "\"]}")
+                .statusCode(SC_OK)
+                .and()
+                .body("success", equalTo(true), "name", notNullValue(), "order", notNullValue());
+        user = null;
+    }
+
+    // Создание заказа без ингредиантов неавторизованным пользователем
+    @Test
+    public void createOrderWithoutIngredientNotAuthUserTest() {
+        //создание заказа
+        given()
+                .log().all()
+                .header("Content-type", "application/json")
+                .when()
+                .post(Constants.CREATE_ORDER)
+                .then()
+                .log().all()
+                .statusCode(SC_BAD_REQUEST)
+                .and()
+                .body(equalTo("{\"success\":false,\"message\":\"Ingredient ids must be provided\"}"));
+        user = null;
+    }
+
+    // Создание заказа с несуществующими ингредиантами неавторизованным пользователем
+    @Test
+    public void createOrderWithNotIsIngredientNotAuthUserTest() {
+        String randomString = Utils.getRandomString(8);
+        //создание заказа
+        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + randomString + "\",\"" + randomString + "\"]}")
+                .statusCode(SC_INTERNAL_SERVER_ERROR);
+        user = null;
+    }
+
+    @After
+    public void deleteUser() {
+        Utils.deleteUser(user);
+    }
+}
