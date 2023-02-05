@@ -47,6 +47,7 @@ public class GetOrdersUserTest {
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
                 .body(equalTo("{\"success\":false,\"message\":\"You should be authorised\"}"));
+        user = null;
     }
 
     @After
