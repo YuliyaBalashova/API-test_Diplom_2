@@ -7,6 +7,8 @@ import org.junit.Test;
 import pojo.Ingredient;
 import pojo.User;
 
+import java.util.ArrayList;
+
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
@@ -36,7 +38,10 @@ public class CreateOrderTest {
         // десериализация тела ответа в класс ChangeUser
         Ingredient ingredient = response.body().as(Ingredient.class);
         //создание заказа
-        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + ingredient.getData().get(1).get_id() + "\",\"" + ingredient.getData().get(2).get_id() + "\"]}", token.substring(7))
+        ArrayList<String> ingredients = new ArrayList<>();
+        ingredients.add(ingredient.getData().get(1).getId());
+        ingredients.add(ingredient.getData().get(2).getId());
+        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + ingredients.get(0) + "\",\"" + ingredients.get(1) + "\"]}", token.substring(7))
                 .statusCode(SC_OK)
                 .and()
                 .body("success", equalTo(true), "name", notNullValue(), "order", notNullValue());
@@ -92,7 +97,10 @@ public class CreateOrderTest {
         // десериализация тела ответа в класс ChangeUser
         Ingredient ingredient = response.body().as(Ingredient.class);
         //создание заказа
-        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + ingredient.getData().get(1).get_id() + "\",\"" + ingredient.getData().get(5).get_id() + "\"]}")
+        ArrayList<String> ingredients = new ArrayList<>();
+        ingredients.add(ingredient.getData().get(4).getId());
+        ingredients.add(ingredient.getData().get(5).getId());
+        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + ingredients.get(0) + "\",\"" + ingredients.get(1) + "\"]}")
                 .statusCode(SC_OK)
                 .and()
                 .body("success", equalTo(true), "name", notNullValue(), "order", notNullValue());

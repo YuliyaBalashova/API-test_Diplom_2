@@ -1,7 +1,12 @@
 package pojo;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 // вложенный класс для десериализации тела ответа по GET-запросу Получение данных об ингредиентах
 public class DataIngredient {
-    private String _id;
+
+    private String id;
     private String name;
     private String type;
     private int proteins;
@@ -12,14 +17,22 @@ public class DataIngredient {
     private String image;
     private String image_mobile;
     private String image_large;
-    private int __v;
+    private int v;
 
-    public String get_id() {
-        return _id;
+    @JsonCreator
+    public DataIngredient(
+            @JsonProperty("_id") String id,
+            @JsonProperty("__v") int v){
+        this.id = id;
+        this.v = v;
     }
 
-    public void set_id(String _id) {
-        this._id = _id;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -102,11 +115,11 @@ public class DataIngredient {
         this.image_large = image_large;
     }
 
-    public int get__v() {
-        return __v;
+    public int getV() {
+        return v;
     }
 
-    public void set__v(int __v) {
-        this.__v = __v;
+    public void setV(int v) {
+        this.v = v;
     }
 }
