@@ -5,6 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import pojo.Ingredient;
+import pojo.IngredientsForOrder;
 import pojo.User;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class CreateOrderTest {
     }
 
     private static User user;
+    private static IngredientsForOrder ingredientsForOrder;
 
     // Создание заказа с ингредиантами авторизованным пользователем
     @Test
@@ -41,7 +43,8 @@ public class CreateOrderTest {
         ArrayList<String> ingredients = new ArrayList<>();
         ingredients.add(ingredient.getData().get(1).getId());
         ingredients.add(ingredient.getData().get(2).getId());
-        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + ingredients.get(0) + "\",\"" + ingredients.get(1) + "\"]}", token.substring(7))
+        ingredientsForOrder = new IngredientsForOrder(ingredients);
+        Utils.doPost(Constants.CREATE_ORDER, ingredientsForOrder, token.substring(7))
                 .statusCode(SC_OK)
                 .and()
                 .body("success", equalTo(true), "name", notNullValue(), "order", notNullValue());
@@ -84,7 +87,11 @@ public class CreateOrderTest {
         String token = Utils.doPost(Constants.CREATE_USER, user)
                 .extract().body().jsonPath().get("accessToken");
         //создание заказа
-        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + randomString + "\",\"" + randomString + "\"]}", token.substring(7))
+        ArrayList<String> ingredients = new ArrayList<>();
+        ingredients.add(randomString);
+        ingredients.add(randomString);
+        ingredientsForOrder = new IngredientsForOrder(ingredients);
+        Utils.doPost(Constants.CREATE_ORDER, ingredientsForOrder, token.substring(7))
                 .statusCode(SC_INTERNAL_SERVER_ERROR);
     }
 
@@ -100,7 +107,8 @@ public class CreateOrderTest {
         ArrayList<String> ingredients = new ArrayList<>();
         ingredients.add(ingredient.getData().get(4).getId());
         ingredients.add(ingredient.getData().get(5).getId());
-        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + ingredients.get(0) + "\",\"" + ingredients.get(1) + "\"]}")
+        ingredientsForOrder = new IngredientsForOrder(ingredients);
+        Utils.doPost(Constants.CREATE_ORDER, ingredientsForOrder)
                 .statusCode(SC_OK)
                 .and()
                 .body("success", equalTo(true), "name", notNullValue(), "order", notNullValue());
@@ -131,7 +139,11 @@ public class CreateOrderTest {
     public void createOrderWithNotIsIngredientNotAuthUserTest() {
         String randomString = Utils.getRandomString(8);
         //создание заказа
-        Utils.doPost(Constants.CREATE_ORDER, "{\"ingredients\":[\"" + randomString + "\",\"" + randomString + "\"]}")
+        ArrayList<String> ingredients = new ArrayList<>();
+        ingredients.add(randomString);
+        ingredients.add(randomString);
+        ingredientsForOrder = new IngredientsForOrder(ingredients);
+        Utils.doPost(Constants.CREATE_ORDER, ingredientsForOrder)
                 .statusCode(SC_INTERNAL_SERVER_ERROR);
         user = null;
     }

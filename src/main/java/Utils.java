@@ -37,8 +37,8 @@ public class Utils {
                 .log().all();
     }
 
-    // POST тело - строка, с токеном (2)
-    public static ValidatableResponse doPost(String endpoint, String body, String token) {
+    // POST с токеном (2)
+    public static ValidatableResponse doPost(String endpoint, Object body, String token) {
         return given()
                 .log().all()
                 .auth().oauth2(token)
@@ -50,7 +50,7 @@ public class Utils {
                 .log().all();
     }
 
-    // POST тело - объект, без токена (18)
+    // POST без токена (20)
     public static ValidatableResponse doPost(String endpoint, Object body) {
         return given()
                 .log().all()
@@ -62,20 +62,8 @@ public class Utils {
                 .log().all();
     }
 
-    // POST тело - строка, без токена (2)
-    public static ValidatableResponse doPost(String endpoint, String body) {
-        return given()
-                .log().all()
-                .header("Content-type", "application/json")
-                .body(body)
-                .when()
-                .post(endpoint)
-                .then()
-                .log().all();
-    }
-
     // PATCH с токеном (Response) (4)
-    public static Response doPatchResp (String endpoint, String body, String token) {
+    public static Response doPatchResp (String endpoint, Object body, String token) {
         return given()
                 .log().all()
                 .auth().oauth2(token)
@@ -86,7 +74,7 @@ public class Utils {
     }
 
     // PATCH без токена (3)
-    public static ValidatableResponse doPatch(String endpoint, String body) {
+    public static ValidatableResponse doPatch(String endpoint, Object body) {
         return given()
                 .log().all()
                 .header("Content-type", "application/json")

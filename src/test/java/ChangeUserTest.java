@@ -33,7 +33,8 @@ public class ChangeUserTest {
         // создание нового email
         String randomEmailNew = Utils.getRandomString(8) + "@" + Utils.getRandomString(6) + "." + Utils.getRandomString(3);
         // изменение email
-        Response response = Utils.doPatchResp(Constants.USER_CHANGE, "{\"email\":\"" + randomEmailNew + "\"}", token.substring(7));
+        user = new User(randomEmailNew, randomString, randomString);
+        Response response = Utils.doPatchResp(Constants.USER_CHANGE, user, token.substring(7));
         // проверка кода ответа
         response.then().statusCode(SC_OK);
         // десериализация тела ответа в класс ChangeUser
@@ -60,7 +61,8 @@ public class ChangeUserTest {
         // создание нового password
         String randomPasswordNew = Utils.getRandomString(7);
         //изменение password
-        Response response = Utils.doPatchResp(Constants.USER_CHANGE, "{\"password\":\"" + randomPasswordNew + "\"}", token.substring(7));
+        user = new User(randomEmail, randomPasswordNew, randomString);
+        Response response = Utils.doPatchResp(Constants.USER_CHANGE, user, token.substring(7));
         // проверка кода ответа
         response.then().statusCode(SC_OK);
         // десериализация тела ответа в класс ChangeUser
@@ -87,7 +89,8 @@ public class ChangeUserTest {
         // создание нового name
         String randomNameNew = Utils.getRandomString(7);
         //изменение name
-        Response response = Utils.doPatchResp(Constants.USER_CHANGE, "{\"name\":\"" + randomNameNew + "\"}", token.substring(7));
+        user = new User(randomEmail, randomString, randomNameNew);
+        Response response = Utils.doPatchResp(Constants.USER_CHANGE, user, token.substring(7));
         // проверка кода ответа
         response.then().statusCode(SC_OK);
         // десериализация тела ответа в класс ChangeUser
@@ -108,16 +111,16 @@ public class ChangeUserTest {
         String randomString = Utils.getRandomString(8);
         String randomEmail = Utils.getRandomString(8) + "@" + Utils.getRandomString(6) + "." + Utils.getRandomString(3);
         user = new User(randomEmail, randomString, randomString);
-        Utils.doPost(Constants.CREATE_USER, user);
+        String token = Utils.doPost(Constants.CREATE_USER, user)   //получение token
+                .extract().body().jsonPath().get("accessToken");
 
         //создание нового пользователя2
         String randomEmailNew = Utils.getRandomString(8) + "@" + Utils.getRandomString(6) + "." + Utils.getRandomString(3);
         user = new User(randomEmailNew, randomString, randomString);
-        String token = Utils.doPost(Constants.CREATE_USER, user)   //получение token
-                .extract().body().jsonPath().get("accessToken");
+        Utils.doPost(Constants.CREATE_USER, user);
 
-        //изменение email пользователя2 на email пользователя1
-        Response response = Utils.doPatchResp(Constants.USER_CHANGE, "{\"email\":\"" + randomEmail + "\"}", token.substring(7));
+        //изменение email пользователя1 на email пользователя2
+        Response response = Utils.doPatchResp(Constants.USER_CHANGE, user, token.substring(7));
         response
                 .then()
                 .statusCode(SC_FORBIDDEN)
@@ -138,10 +141,13 @@ public class ChangeUserTest {
         String randomEmailNew = Utils.getRandomString(8) + "@" + Utils.getRandomString(6) + "." + Utils.getRandomString(3);  //создание нового email
 
         //изменение email
-        Utils.doPatch(Constants.USER_CHANGE, "{\"email\":\"" + randomEmailNew + "\"}")
+        user = new User(randomEmailNew, randomString, randomString);
+        Utils.doPatch(Constants.USER_CHANGE, user)
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
                 .body(equalTo("{\"success\":false,\"message\":\"You should be authorised\"}"));
+
+        user = new User(randomEmail, randomString, randomString); //для удаления пользователя
     }
 
     //Изменение password пользователя без авторизации
@@ -157,10 +163,13 @@ public class ChangeUserTest {
         String randomPasswordNew = Utils.getRandomString(7);  //создание нового password
 
         //изменение password
-        Utils.doPatch(Constants.USER_CHANGE, "{\"password\":\"" + randomPasswordNew + "\"}")
+        user = new User(randomEmail, randomPasswordNew, randomString);
+        Utils.doPatch(Constants.USER_CHANGE, user)
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
                 .body(equalTo("{\"success\":false,\"message\":\"You should be authorised\"}"));
+
+        user = new User(randomEmail, randomString, randomString); //для удаления пользователя
     }
 
     //Изменение name пользователя без авторизации
@@ -175,11 +184,14 @@ public class ChangeUserTest {
 
         String randomNameNew = Utils.getRandomString(7);  //создание нового name
 
-        //изменение password
-        Utils.doPatch(Constants.USER_CHANGE, "{\"name\":\"" + randomNameNew + "\"}")
+        //изменение name
+        user = new User(randomEmail, randomString, randomNameNew);
+        Utils.doPatch(Constants.USER_CHANGE, user)
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
                 .body(equalTo("{\"success\":false,\"message\":\"You should be authorised\"}"));
+
+        user = new User(randomEmail, randomString, randomString); //для удаления пользователя
     }
 
     @After
